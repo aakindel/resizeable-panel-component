@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import usePanelResize from "./hooks/usePanelResize";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { useRefDimensions } from "./hooks/useRefDimensions";
@@ -264,7 +264,7 @@ export const ResizeablePanelIFrame = ({
 
   const handleWidth = pxHandleWidth ? pxHandleWidth : DEFAULT_PX_HANDLE_WIDTH;
 
-  useEffect(() => {
+  const loadPanelIFrame = useCallback(() => {
     const handleDiv = document.createElement("div");
     handleDiv.id = "iframe-handle";
     handleDiv.setAttribute(
@@ -303,11 +303,21 @@ export const ResizeablePanelIFrame = ({
     } catch (error) {
       console.error(error);
     }
-  }, [contentRef.current?.contentWindow, handleWidth]);
+  }, [contentRef, handleWidth]);
+
+  useEffect(() => {
+    loadPanelIFrame();
+  }, [loadPanelIFrame]);
 
   return (
     <ResizeablePanel {...props}>
-      <iframe ref={contentRef} src={iframeSrc}></iframe>
+      <iframe
+        ref={contentRef}
+        src={iframeSrc}
+        onLoad={() => {
+          loadPanelIFrame();
+        }}
+      ></iframe>
     </ResizeablePanel>
   );
 };
