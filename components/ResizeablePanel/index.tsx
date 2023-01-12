@@ -265,43 +265,43 @@ export const ResizeablePanelIFrame = ({
   const handleWidth = pxHandleWidth ? pxHandleWidth : DEFAULT_PX_HANDLE_WIDTH;
 
   const loadPanelIFrame = useCallback(() => {
-    const handleDiv = document.createElement("div");
-    handleDiv.id = "iframe-handle";
-    handleDiv.setAttribute(
-      "class",
-      "absolute top-0 left-full flex h-full cursor-ew-resize items-center justify-center bg-transparent"
-    );
-    handleDiv.style.width = `${handleWidth}px`;
+    // if the link is internal
+    if (contentRef?.current?.src?.startsWith("/")) {
+      const handleDiv = document.createElement("div");
+      handleDiv.id = "iframe-handle";
+      handleDiv.setAttribute(
+        "class",
+        "absolute top-0 left-full flex h-full cursor-ew-resize items-center justify-center bg-transparent"
+      );
+      handleDiv.style.width = `${handleWidth}px`;
 
-    try {
-      const nextElem =
-        contentRef?.current?.contentWindow?.document.getElementById("__next");
+      try {
+        const nextElem =
+          contentRef?.current?.contentWindow?.document.getElementById("__next");
 
-      if (nextElem) {
-        nextElem.style.height = "100vh";
-        if (
-          !contentRef?.current?.contentWindow?.document.getElementById(
-            "iframe-handle"
-          )
-        ) {
-          /* iframe takes up full width so touchEvents on handle will be
+        if (nextElem) {
+          nextElem.style.height = "100vh";
+          if (
+            !contentRef?.current?.contentWindow?.document.getElementById(
+              "iframe-handle"
+            )
+          ) {
+            /* iframe takes up full width so touchEvents on handle will be
              picked up by iframe unless iframe has its own resize handle in the
              same location of the panel resize handle */
-          nextElem.appendChild(handleDiv);
+            nextElem.appendChild(handleDiv);
+          }
         }
-      }
 
-      if (contentRef?.current?.contentWindow?.document) {
-        contentRef.current.style.height = "100%";
-        contentRef.current.style.width = "100%";
-        contentRef.current.style.overflow = "hidden";
-        contentRef.current.contentWindow.document.body.style.height = "100%";
-        contentRef.current.contentWindow.document.body.style.width = "100%";
-        contentRef.current.contentWindow.document.body.style.overflow =
-          "hidden";
+        if (contentRef?.current?.contentWindow?.document) {
+          contentRef.current.contentWindow.document.body.style.height = "100%";
+          contentRef.current.contentWindow.document.body.style.width = "100%";
+          contentRef.current.contentWindow.document.body.style.overflow =
+            "hidden";
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
     }
   }, [contentRef, handleWidth]);
 
@@ -312,6 +312,7 @@ export const ResizeablePanelIFrame = ({
   return (
     <ResizeablePanel {...props}>
       <iframe
+        className="h-full w-full overflow-hidden"
         ref={contentRef}
         src={iframeSrc}
         onLoad={() => {
