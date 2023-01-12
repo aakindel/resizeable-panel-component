@@ -11,7 +11,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <p>Default template removed.</p>
+        <p className="text-base">Default template removed.</p>
       </main>
     </div>
   );
